@@ -1,36 +1,32 @@
-<style>pre {white-space: normal;}</style>
-<h1>Listing tests</h1>
+<style>
+  pre {white-space: normal; padding: 10px; margin: 10px;}
+  <%= @style %>
+</style>
+<h1>Testando</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Title</th>
-      <th>Content</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
 
-  <tbody>
-    <% @tests.each do |test| %>
-      <tr>
-        <td><%= test.name %></td>
-        <td><%= test.title %></td>
-        <td><%= test.content %></td>
-        <td><%= link_to 'Show', test %></td>
-        <td><%= link_to 'Edit', edit_test_path(test) %></td>
-        <td><%= link_to 'Destroy', test, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-<%= link_to 'New Test', new_test_path %>
-<pre>
-{"status"=>"success", "photos"=>[{"url"=>"https://scontent-gru.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/295925_299091690117203_1901965243_n.jpg?oh=5e9b40f8a84da49056f1bade75a5c2f5&oe=55A4F3DD", "pid"=>"F@01df0c701995bd986cba45fc7b36174d_6d24271ca738e", "width"=>552, "height"=>635, "tags"=>[{"uids"=>[], "label"=>nil, "confirmed"=>false, "manual"=>false, "width"=>27.54, "height"=>23.94, "yaw"=>0, "roll"=>9, "pitch"=>0, "attributes"=>{"face"=>{"value"=>"true", "confidence"=>57}}, "points"=>nil, "similarities"=>nil, "tid"=>"TEMP_F@01df0c701995bd986cba45fc014400ee_6d24271ca738e_58.70_37.48_0_1", "recognizable"=>true, "center"=>{"x"=>58.7, "y"=>37.48}, "eye_left"=>{"x"=>67.21, "y"=>32.44, "confidence"=>55, "id"=>449}, "eye_right"=>{"x"=>52.72, "y"=>30.24, "confidence"=>54, "id"=>450}, "mouth_center"=>{"x"=>55.62, "y"=>45.2, "confidence"=>14, "id"=>615}, "nose"=>{"x"=>58.7, "y"=>39.84, "confidence"=>51, "id"=>403}}]}], "usage"=>{"used"=>4, "remaining"=>96, "limit"=>100, "reset_time"=>1427513397, "reset_time_text"=>"Sat, 28 March 2015 03:29:57 +0000"}, "operation_id"=>"98b451027d604fe7894e66e2c4184492"}
-</pre>
 
 <pre>
-Face.get_client(:api_key => '0da8aecb5c5742d5828dd1f3dcb803e3', :api_secret => 'f5abf82e3c30437da4a1493570b2eed0').faces_detect(:urls => ['https://scontent-gru.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/295925_299091690117203_1901965243_n.jpg?oh=5e9b40f8a84da49056f1bade75a5c2f5&oe=55A4F3DD'])
+<%= @json.to_json.html_safe %>
 </pre>
+<pre>
+<%= @json['photos'][0]['tags'][0]['eye_left']['x'] %>
+</pre>
+
+
+
+<div id="content_demo_image" style="width: 480px;">
+  <div class="image_wrapper">
+    <img alt="face detection results" src="<%= @json['photos'][0]['url'] %>">
+
+    <div class="api_face" data-hasqtip="true" aria-describedby="qtip-0">
+      <div class="api_face_inner">
+        <div class="api_face_inner_tid" name="<%= @json['photos'][0]['tags'][0]['tid'] %>"></div>
+      </div>
+    </div>
+    <span class="api_face_point eye_left" title="<%= @eye_left[0]['title'] %>%"></span>
+    <span class="api_face_point eye_right" title="<%= @eye_right[0]['title'] %>%"></span>
+    <span class="api_face_point mouth" title="<%= @mouth_center[0]['title'] %>%"></span>
+    <span class="api_face_point nose" title="<%= @nose[0]['title'] %>%"></span>
+  </div>
+</div>
