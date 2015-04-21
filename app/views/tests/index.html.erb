@@ -1,32 +1,26 @@
-<style>
-  pre {white-space: normal; padding: 10px; margin: 10px;}
-  <%= @style %>
-</style>
-<h1>Testando</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Title</th>
+      <th>Content</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
 
+  <tbody>
+    <% @tests.each do |test| %>
+      <tr>
+        <td><%= test.name %></td>
+        <td><%= test.title %></td>
+        <td><%= test.content %></td>
+        <td><%= link_to 'Show', test %></td>
+        <td><%= link_to 'Edit', edit_test_path(test) %></td>
+        <td><%= link_to 'Destroy', test, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
-
-<pre>
-<%= @json.to_json.html_safe %>
-</pre>
-<pre>
-<%= @json['photos'][0]['tags'][0]['eye_left']['x'] %>
-</pre>
-
-
-
-<div id="content_demo_image" style="width: 480px;">
-  <div class="image_wrapper">
-    <img alt="face detection results" src="<%= @json['photos'][0]['url'] %>">
-
-    <div class="api_face" data-hasqtip="true" aria-describedby="qtip-0">
-      <div class="api_face_inner">
-        <div class="api_face_inner_tid" name="<%= @json['photos'][0]['tags'][0]['tid'] %>"></div>
-      </div>
-    </div>
-    <span class="api_face_point eye_left" title="<%= @eye_left[0]['title'] %>%"></span>
-    <span class="api_face_point eye_right" title="<%= @eye_right[0]['title'] %>%"></span>
-    <span class="api_face_point mouth" title="<%= @mouth_center[0]['title'] %>%"></span>
-    <span class="api_face_point nose" title="<%= @nose[0]['title'] %>%"></span>
-  </div>
-</div>
+<br>
+<%= link_to 'New Test', new_test_path %>

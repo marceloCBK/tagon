@@ -1,0 +1,68 @@
+<style>
+  pre {white-space: normal; padding: 10px; margin: 10px;}
+  <% @style.each do |css| %>
+  <%= css[1] %>
+  <% end %>
+</style>
+<h1>Reconhecendo</h1>
+
+
+
+<pre><h3>faces/recognize</h3>
+<%= @jsonGroup.to_json.html_safe %>
+</pre>
+
+<pre><h3>each</h3>
+<%= @faces.to_json.html_safe %>
+</pre>
+
+<pre><h3>conf</h3>
+<%= @faces[0][:confidence] %>
+</pre>
+
+<div id="content_demo_image" style="width: 480px;">
+  <div class="image_wrapper">
+    <img alt="face detection results" src="<%= @jsonGroup['photos'][0]['url'] %>">
+    
+    <% @faces.each_with_index do |face, index| %>
+    <div class="item">
+      <div class="api_face api_face<%= index %>" data-hasqtip="true" aria-describedby="qtip-0">
+        <div class="api_face_inner">
+          <div class="api_face_inner_tid" name="<%= face[1]['tid'] %>"><%= face[1][:confidence] %>%</div>
+        </div>
+      </div>
+      <span class="api_face_point eye_left<%= index %>"   title="<%= face[1][:eye_left][:title] %>%"></span>
+      <span class="api_face_point eye_right<%= index %>"  title="<%= face[1][:eye_right][:title] %>%"></span>
+      <span class="api_face_point mouth<%= index %>"      title="<%= face[1][:mouth_center][:title] %>%"></span>
+      <span class="api_face_point nose<%= index %>"       title="<%= face[1][:nose][:title] %>%"></span>
+    </div>
+    <% end  %>
+
+  </div>
+  
+    
+  
+  <div id="qtip-0" class="qtip qtip-default qtip-light qtip-pos-tc" style="z-index: 15001;">
+    <div class="qtip-tip" style="border: 0px !important; height: 8px; width: 8px; line-height: 8px; left: 50%; margin-left: -4px; top: -8px; background-color: transparent !important;">
+      <canvas height="8" width="8" style="border: 0px !important; background-color: transparent !important;"></canvas>
+    </div>
+    <div class="qtip-titlebar">
+      <div id="qtip-0-title" class="qtip-title" aria-atomic="true">face: (70%)</div>
+    </div>
+    <div class="qtip-content" id="qtip-0-content" aria-atomic="true">
+      gender: female (75%)<br>
+      smiling: true (100%)<br>
+      glasses: false (81%)<br>
+      dark_glasses: false (58%)<br>
+      lips: parted (100%)<br>
+      eyes: open (87%)<br>
+      age: 16<br>
+      mood: happy (76%)<br>
+      &nbsp;&nbsp;N: 0%, A: 45%, D: 1%, F: 0%<br>
+      &nbsp;&nbsp;H: 76%, S: 2%, SP: 6%<br>
+      roll: -1°, yaw: -6°
+    </div>
+  </div>
+  
+  
+</div>

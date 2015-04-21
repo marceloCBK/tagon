@@ -1,0 +1,94 @@
+<style>
+  pre {white-space: normal; padding: 10px; margin: 10px;}
+  <% @style.each do |css| %>
+  <%= css[1] %>
+  <% end %>
+</style>
+<h1>Detectando</h1>
+
+
+
+<pre><h3>faces/detect</h3>
+<%= @response.to_json.html_safe %>
+</pre>
+<pre><h3>tags/save</h3>
+<%= @tagsSave %>
+</pre>
+<pre><h3>faces/train</h3>
+<%= @facesTrain %>
+</pre>
+<pre><h3>each</h3>
+<%= @faces.to_json.html_safe %>
+</pre>
+<pre><h3>POSTs</h3>
+<%= Rails.root.to_s + params['person']['file1'].path.to_s unless params['person'].nil? %>
+<%= debug(params['person'].nil?)  %>
+</pre>
+
+
+<%= form_for :person, html: {id: "verifyForm" } do |f| %>
+    <div class="content_demo_column" style="margin-right: 10px;">
+        <div id="content_demo_sidebar1">
+            <div class="invisible img_max_width">480</div>
+            <div class="invisible img_max_height">768</div>
+            <div class="fieldset_label">Local file / URL</div>
+            <div class="fieldset_field">
+                <div class="the_url_clear" style="display: block;">×</div>
+              <%= f.text_field :url1, :class => "the_url", :placeholder => "first image for face recognition", :disabled => "" %><br />
+                <div id="url1copy" style="display: none;">DSC00188.JPG</div>
+            </div>
+            <div class="upload_button_real" style="margin-bottom: 10px;">
+                Browse...
+                <%= f.file_field(:file1, :class => "upload_button_ghost valid", :style => "left: -203.5px; top: 6px;", :accept => "image/*;capture=camera") %><br />
+            </div>
+          <%= f.submit :value => "Submit", :class => "fieldset_button", :style => "float: left; margin-right: 0; margin-bottom: 10px;" %>
+        </div>
+    </div>
+<% end %>
+
+<!--
+<form action="" id="verifyForm" method="post" novalidate="novalidate">
+    
+    <div class="content_demo_column" style="margin-right: 10px;">
+        <div id="content_demo_sidebar1">
+            <div class="invisible img_max_width">480</div>
+            <div class="invisible img_max_height">768</div>
+            <div class="fieldset_label">Local file / URL</div>
+            <div class="fieldset_field">
+                <div class="the_url_clear" style="display: block;">×</div>
+                <input name="imageUrl1" class="the_url" id="url1" placeholder="first image for face recognition" value="http://skybiometry.com/Content/Samples/pair0.jpg" disabled="">
+                <div id="url1copy" style="display: none;">DSC00188.JPG</div>
+            </div>
+            <div class="upload_button_real" style="margin-bottom: 10px;">
+                Browse...
+                <input type="file" name="file1" id="file1" class="upload_button_ghost valid" onchange=" fileOnChange(this) " style="left: -203.5px; top: 6px;">
+            </div>
+            <input type="submit" value="Submit" class="fieldset_button" style="float: left; margin-right: 0; margin-bottom: 10px;">
+        </div>
+    </div>
+
+</form>
+-->
+<% unless @response.nil? %>
+<div id="content_demo_image" style="width: 480px;">
+  <div class="image_wrapper">
+    <img alt="face detection results" src="<%= @response['photos'][0]['url'] %>">
+    
+    <% @faces.each_with_index do |face, index| %>
+    <div class="item">
+      <div class="api_face api_face<%= index %>" data-hasqtip="true" aria-describedby="qtip-0">
+        <div class="api_face_inner">
+          <div class="api_face_inner_tid" name="<%= @response['photos'][0]['tags'][index]['tid'] %>"></div>
+        </div>
+      </div>
+      <span class="api_face_point eye_left<%= index %>"   title="<%= face[1][:eye_left][:title] %>%"></span>
+      <span class="api_face_point eye_right<%= index %>"  title="<%= face[1][:eye_right][:title] %>%"></span>
+      <span class="api_face_point mouth<%= index %>"      title="<%= face[1][:mouth_center][:title] %>%"></span>
+      <span class="api_face_point nose<%= index %>"       title="<%= face[1][:nose][:title] %>%"></span>
+    </div>
+    <% end  %>
+
+  </div>
+</div>
+<% end  %>
+
