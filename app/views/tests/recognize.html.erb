@@ -4,31 +4,132 @@
   <%= css[1] %>
   <% end %>
 </style>
+
 <h1>Reconhecendo</h1>
 
-
-
 <pre><h3>faces/recognize</h3>
-<%= @jsonGroup.to_json.html_safe %>
+<%= @response.to_json.html_safe %>
 </pre>
-
+<pre><h3>tags/save</h3>
+<%= @tagsSave %>
+</pre>
+<pre><h3>faces/train</h3>
+<%= @facesTrain %>
+</pre>
 <pre><h3>each</h3>
 <%= @faces.to_json.html_safe %>
 </pre>
-
 <pre><h3>conf</h3>
 <%= @faces[0][:confidence] %>
 </pre>
 
+<% if !params['person'].blank? %>
+<pre><h3>file1</h3>
+<%= debug(!params['person']['file1'].blank?) %>
+</pre>
+<pre><h3>url1</h3>
+<%= debug(!params['person']['url1'].blank?)  %>
+</pre>
+<% end %>
+
+<pre><h3>form</h3>
+<%= debug(params)  %>
+</pre>
+
+
+<%= form_for :person, html: {id: "verifyForm" } do |f| %>
+    <div class="content_demo_column" style="margin-right: 10px;">
+        <div id="content_demo_sidebar1">
+            <div class="invisible img_max_width">480</div>
+            <div class="invisible img_max_height">768</div>
+            <div class="fieldset_label">Local file / URL</div>
+            <div class="fieldset_field">
+                <div class="the_url_clear" style="display: block;">×</div>
+              <%= f.text_field :url1, :class => "the_url", :placeholder => "first image for face recognition" %><br />
+            </div>
+            <div class="upload_button_real" style="margin-bottom: 10px;">
+                Browse...
+                <%= f.file_field(:file1, :class => "upload_button_ghost valid", :style => "left: -203.5px; top: 6px;", :accept => "image/*;capture=camera") %><br />
+            </div>
+          <%= f.submit :value => "Submit", :class => "fieldset_button", :style => "float: left; margin-right: 0; margin-bottom: 10px;" %>
+        </div>
+    </div>
+<% end %>
+
+
+
+		<script language="JavaScript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script language="JavaScript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+		<script language="JavaScript" src="//www.scriptcam.com/scriptcam.js"></script>
+		<script language="JavaScript"> 
+			$(document).ready(function() {
+				$("#webcam").scriptcam({
+					showMicrophoneErrors:false,
+					onError:onError,
+					cornerRadius:20,
+					disableHardwareAcceleration:1,
+					cornerColor:'e3e5e2',
+					onWebcamReady:onWebcamReady,
+					uploadImage:'upload.gif',
+					onPictureAsBase64:base64_tofield_and_image
+				});
+			});
+			function base64_tofield() {
+				$('#formfield').val($.scriptcam.getFrameAsBase64());
+			};
+			function base64_toimage() {
+				$('#image').attr("src","data:image/png;base64,"+$.scriptcam.getFrameAsBase64());
+				$('#person_url1').val("data:image/png;base64,"+$.scriptcam.getFrameAsBase64());
+			};
+			function base64_tofield_and_image(b64) {
+				$('#formfield').val(b64);
+				$('#image').attr("src","data:image/png;base64,"+b64);
+			};
+			function changeCamera() {
+				$.scriptcam.changeCamera($('#cameraNames').val());
+			}
+			function onError(errorId,errorMsg) {
+				$( "#btn1" ).attr( "disabled", true );
+				$( "#btn2" ).attr( "disabled", true );
+				alert(errorMsg);
+			}			
+			function onWebcamReady(cameraNames,camera,microphoneNames,microphone,volume) {
+				$.each(cameraNames, function(index, text) {
+					$('#cameraNames').append( $('<option></option>').val(index).html(text) )
+				}); 
+				$('#cameraNames').val(camera);
+			}
+		</script>
+    
+		<div style="width:330px;float:left;">
+			<div id="webcam">
+			</div>
+			<div style="margin:5px;">
+				<img src="webcamlogo.png" style="vertical-align:text-top"/>
+				<select id="cameraNames" size="1" onChange="changeCamera()" style="width:245px;font-size:10px;height:25px;">
+				</select>
+			</div>
+		</div>
+		<div style="width:135px;float:left;">
+			<p><button class="btn btn-small" id="btn1" onclick="base64_tofield()">Snapshot to form</button></p>
+			<p><button class="btn btn-small" id="btn2" onclick="base64_toimage()">Snapshot to image</button></p>
+		</div>
+		<div style="width:200px;float:left;">
+			<p><textarea id="formfield" style="width:190px;height:70px;"></textarea></p>
+			<p><img id="image" style="width:200px;height:153px;"/></p>
+		</div>
+
+
+<% if !@response.nil? %>
 <div id="content_demo_image" style="width: 480px;">
   <div class="image_wrapper">
-    <img alt="face detection results" src="<%= @jsonGroup['photos'][0]['url'] %>">
+    <img alt="face detection results" src="<%= @response['photos'][0]['url'] %>">
     
     <% @faces.each_with_index do |face, index| %>
     <div class="item">
       <div class="api_face api_face<%= index %>" data-hasqtip="true" aria-describedby="qtip-0">
         <div class="api_face_inner">
-          <div class="api_face_inner_tid" name="<%= face[1]['tid'] %>"><%= face[1][:confidence] %>%</div>
+          <div class="api_face_inner_tid" name="<%= @response['photos'][0]['tags'][index]['tid'] %>"><%= face[1][:confidence] %>%</div>
         </div>
       </div>
       <span class="api_face_point eye_left<%= index %>"   title="<%= face[1][:eye_left][:title] %>%"></span>
@@ -39,10 +140,10 @@
     <% end  %>
 
   </div>
-  
-    
-  
-  <div id="qtip-0" class="qtip qtip-default qtip-light qtip-pos-tc" style="z-index: 15001;">
+</div>
+<% end  %>
+
+<div id="qtip-0" class="qtip qtip-default qtip-light qtip-pos-tc" style="z-index: 15001;">
     <div class="qtip-tip" style="border: 0px !important; height: 8px; width: 8px; line-height: 8px; left: 50%; margin-left: -4px; top: -8px; background-color: transparent !important;">
       <canvas height="8" width="8" style="border: 0px !important; background-color: transparent !important;"></canvas>
     </div>
@@ -63,6 +164,5 @@
       roll: -1°, yaw: -6°
     </div>
   </div>
-  
-  
-</div>
+
+

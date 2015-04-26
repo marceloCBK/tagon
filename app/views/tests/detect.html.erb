@@ -20,12 +20,16 @@
 <pre><h3>each</h3>
 <%= @faces.to_json.html_safe %>
 </pre>
+
+<% if !params['person'].blank? %>
 <pre><h3>file1</h3>
-<%= debug(!params['person']['file1'].blank?)  %>
+<%= debug(!params['person']['file1'].blank?) %>
 </pre>
 <pre><h3>url1</h3>
 <%= debug(!params['person']['url1'].blank?)  %>
 </pre>
+<% end %>
+
 <pre><h3>form</h3>
 <%= debug(params)  %>
 </pre>
@@ -114,7 +118,7 @@
 		</div>
 
 
-<% unless @response.nil? %>
+<% if !@response.nil? %>
 <div id="content_demo_image" style="width: 480px;">
   <div class="image_wrapper">
     <img alt="face detection results" src="<%= @response['photos'][0]['url'] %>">

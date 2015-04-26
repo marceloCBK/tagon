@@ -11,16 +11,41 @@ class TestsController < ApplicationController
   # GET /reconher
   def recognize     
     
+    #verifica os dados recebidos
+    form = params['person']
+    if !form.blank?
+      file = form['file1'] # para upload
+      url = form['url1'] # para url e base64
+      uid = 'marcelo@Test2'
+      # verifica imagem recebida, preferencialmente "url"
+      if !url.blank? 
+        response = @face.faces_recognize(:uids => uid, :urls => url) unless url.blank?
+      elsif !file.blank?
+        response = @face.faces_recognize(:uids => uid, :file => file) unless file.blank?
+      end
+    end
+    
+    #verifica a resposta da análise da imagem, e pega seus dados "tags"
+    if !response.blank? 
+      tags = response['photos'][0]['tags']
+    else                  
+      tags = @jsonGroup['photos'][0]['tags'] # dados de preenchimento
+      response = @jsonGroup
+    end
+    
+    @response = response # envia "response" para a view
+    
     @faces = {}
     @style = {}
-    @jsonGroup['photos'][0]['tags'].each_with_index   do |face, index|
+    
+    tags.each_with_index   do |face, index|
         @faces[index] = {
           :eye_left     => {:title => "Left eye: X=#{face['eye_left']['x']}, Y=#{face['eye_left']['y']}, Confidence=#{face['eye_left']['confidence']}"},
           :eye_right    => {:title => "Left eye: X=#{face['eye_right']['x']}, Y=#{face['eye_right']['y']}, Confidence=#{face['eye_right']['confidence']}"},
           :mouth_center => {:title => "Left eye: X=#{face['mouth_center']['x']}, Y=#{face['mouth_center']['y']}, Confidence=#{face['mouth_center']['confidence']}"},
           :nose         => {:title => "Left eye: X=#{face['nose']['x']}, Y=#{face['nose']['y']}, Confidence=#{face['nose']['confidence']}"},
-          :confidence   => face['uids'][0]['confidence']
         }
+        @faces[index][:confidence] = face['uids'][0]['confidence'] if !face['uids'][0].blank?
 
         @style[index] = "
           .eye_left#{index} {
@@ -52,7 +77,7 @@ class TestsController < ApplicationController
   
   # GET /detectar
   def detect
-    face = Face.get_client(:api_key => '0da8aecb5c5742d5828dd1f3dcb803e3', :api_secret => 'f5abf82e3c30437da4a1493570b2eed0')
+    #face = Face.get_client(:api_key => '0da8aecb5c5742d5828dd1f3dcb803e3', :api_secret => 'f5abf82e3c30437da4a1493570b2eed0')
     #@tagsSave = face.tags_save(:uid => 'marcelo@Test2', :tids => @json['photos'][0]['tags'][0]['tid'])
     #@facesTrain = face.faces_train(:uids => 'marcelo', :namespace  => 'Test2')
     #@reconhecendo = face.faces_recognize(:uids => 'marcelo@Test2', :urls => 'https://scontent-gru.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/295925_299091690117203_1901965243_n.jpg?oh=5e9b40f8a84da49056f1bade75a5c2f5&oe=55A4F3DD')
@@ -65,9 +90,9 @@ class TestsController < ApplicationController
 
       # verifica imagem recebida, preferencialmente "url"
       if !url.blank? 
-        response = face.faces_detect(:urls => url) unless url.blank?
+        response = @face.faces_detect(:urls => url) unless url.blank?
       elsif !file.blank?
-        response = face.faces_detect(:file => file) unless file.blank?
+        response = @face.faces_detect(:file => file) unless file.blank?
       end
     end
     
