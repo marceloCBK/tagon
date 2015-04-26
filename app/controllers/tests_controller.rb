@@ -57,20 +57,34 @@ class TestsController < ApplicationController
     #@facesTrain = face.faces_train(:uids => 'marcelo', :namespace  => 'Test2')
     #@reconhecendo = face.faces_recognize(:uids => 'marcelo@Test2', :urls => 'https://scontent-gru.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/295925_299091690117203_1901965243_n.jpg?oh=5e9b40f8a84da49056f1bade75a5c2f5&oe=55A4F3DD')
     
-    file = params['person']['file1'] unless params['person'].nil?
-    response = face.faces_detect(:file => file) unless file.nil?
-    @response = response
-    #dados = response['photos'][0]['tags'] 
-    unless response.nil? 
-      dados = response['photos'][0]['tags']
-    else                  
-      dados = @jsonGroup['photos'][0]['tags'] 
+    #verifica os dados recebidos
+    form = params['person']
+    if !form.blank?
+      file = form['file1'] # para upload
+      url = form['url1'] # para url e base64
+
+      # verifica imagem recebida, preferencialmente "url"
+      if !url.blank? 
+        response = face.faces_detect(:urls => url) unless url.blank?
+      elsif !file.blank?
+        response = face.faces_detect(:file => file) unless file.blank?
+      end
     end
+    
+    #verifica a resposta da análise da imagem, e pega seus dados "tags"
+    if !response.blank? 
+      tags = response['photos'][0]['tags']
+    else                  
+      tags = @jsonGroup['photos'][0]['tags'] # dados de preenchimento
+      response = @jsonGroup
+    end
+    
+    @response = response # envia "response" para a view
     
     @faces = {}
     @style = {}
     
-    dados.each_with_index   do |face, index|
+    tags.each_with_index   do |face, index|
         @faces[index] = {
           :eye_left     => {:title => "Left eye: X=#{face['eye_left']['x']}, Y=#{face['eye_left']['y']}, Confidence=#{face['eye_left']['confidence']}"},
           :eye_right    => {:title => "Left eye: X=#{face['eye_right']['x']}, Y=#{face['eye_right']['y']}, Confidence=#{face['eye_right']['confidence']}"},
