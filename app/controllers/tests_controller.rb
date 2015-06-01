@@ -16,7 +16,7 @@ class TestsController < ApplicationController
     if !form.blank?
       file = form['file1'] # para upload
       url = form['url1'] # para url e base64
-      uid = 'marcelo@Test2'
+      uid = 'all@Test2'
       # verifica imagem recebida, preferencialmente "url"
       if !url.blank? 
         response = @face.faces_recognize(:uids => uid, :urls => url) unless url.blank?
@@ -96,9 +96,12 @@ class TestsController < ApplicationController
       end
     end
     
+    
     #verifica a resposta da análise da imagem, e pega seus dados "tags"
     if !response.blank? 
       tags = response['photos'][0]['tags']
+      @tagsSave = @face.tags_save(:uid => '123@Test2', :tids => response['photos'][0]['tags'][0]['tid'])
+      @facesTrain = @face.faces_train(:uids => '123', :namespace  => 'Test2')
     else                  
       tags = @jsonGroup['photos'][0]['tags'] # dados de preenchimento
       response = @jsonGroup
